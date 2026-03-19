@@ -62,7 +62,7 @@ export const BookDetailsModal = ({ open, book, onClose }) => {
       }}
     >
       <div
-        className={`relative w-[min(760px,92vw)] rounded-3xl bg-white/95 backdrop-blur-sm border border-slate-200/50 shadow-2xl p-8 transform transition-all duration-200 ${
+        className={`relative w-[min(760px,96vw)] rounded-3xl bg-white/95 backdrop-blur-sm border border-slate-200/50 shadow-2xl p-4 sm:p-8 transform transition-all duration-200 ${
           visible ? "scale-100 opacity-100" : "scale-95 opacity-0"
         }`}
         onClick={(e) => e.stopPropagation()}
@@ -94,7 +94,7 @@ export const BookDetailsModal = ({ open, book, onClose }) => {
         </button>
 
         <div className="flex flex-col items-center text-center gap-6">
-          <div className="w-44 h-60 rounded-3xl bg-gradient-to-br from-blue-50 to-indigo-50 border border-slate-200/70 shadow-lg flex items-center justify-center overflow-hidden">
+          <div className="w-32 h-44 sm:w-44 sm:h-60 rounded-3xl bg-gradient-to-br from-blue-50 to-indigo-50 border border-slate-200/70 shadow-lg flex items-center justify-center overflow-hidden">
             <img
               src={normalizedCoverUrl && !imgFailed ? normalizedCoverUrl : placeholderSrc}
               alt={book.title}

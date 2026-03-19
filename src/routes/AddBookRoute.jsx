@@ -198,7 +198,7 @@ export const AddBookRoute = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-4 sm:p-6">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
@@ -210,12 +210,12 @@ export const AddBookRoute = () => {
             </div>
             <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r from-indigo-400 to-blue-500 rounded-full animate-pulse shadow-lg"></div>
           </div>
-          <h1 className="text-4xl font-black mb-3">
+          <h1 className="text-3xl sm:text-4xl font-black mb-3">
             <span className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-600 bg-clip-text text-transparent">
               Add New Book
             </span>
           </h1>
-          <p className="text-xl text-slate-600 max-w-md mx-auto leading-relaxed">
+          <p className="text-base sm:text-xl text-slate-600 max-w-md mx-auto leading-relaxed">
             Expand your reading collection and discover new worlds
           </p>
         </div>
@@ -223,7 +223,7 @@ export const AddBookRoute = () => {
         {/* Form Card */}
         <div className="relative">
           <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-500 rounded-3xl blur-xl opacity-10"></div>
-          <div className="relative bg-white/90 backdrop-blur-sm rounded-3xl p-10 border border-slate-200/50 shadow-2xl">
+          <div className="relative bg-white/90 backdrop-blur-sm rounded-3xl p-6 sm:p-10 border border-slate-200/50 shadow-2xl">
             <form onSubmit={handleSubmit} className="space-y-8">
               <div className="space-y-4">
                 <Label htmlFor="title" className="text-slate-700 font-semibold flex items-center gap-3 text-lg">
@@ -252,7 +252,7 @@ export const AddBookRoute = () => {
                       // Delay closing to allow clicking a dropdown item.
                       blurTimeoutRef.current = setTimeout(() => setShowDropdown(false), 120);
                     }}
-                    className="w-full px-6 py-4 border-2 border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-lg placeholder-slate-500 rounded-2xl"
+                  className="w-full px-4 sm:px-6 py-3 sm:py-4 border-2 border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-base sm:text-lg placeholder-slate-500 rounded-2xl"
                   />
 
                   {showDropdown && (
@@ -332,7 +332,7 @@ export const AddBookRoute = () => {
                   onChange={(e) => setAuthor(e.target.value)}
                   placeholder="Enter author name"
                   autoComplete="off"
-                  className="w-full px-6 py-4 border-2 border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-300 text-lg placeholder-slate-500 rounded-2xl"
+                  className="w-full px-4 sm:px-6 py-3 sm:py-4 border-2 border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-300 text-base sm:text-lg placeholder-slate-500 rounded-2xl"
                 />
               </div>
 
@@ -363,7 +363,7 @@ export const AddBookRoute = () => {
                   type="button"
                   onClick={() => navigate("/")}
                   variant="outline"
-                  className="flex-1 text-slate-700 border-2 border-slate-300 hover:bg-gradient-to-r hover:from-slate-50 hover:to-slate-100 hover:border-slate-400 bg-white text-lg px-8 py-4 rounded-2xl transition-all duration-300 font-medium"
+                  className="flex-1 text-slate-700 border-2 border-slate-300 hover:bg-gradient-to-r hover:from-slate-50 hover:to-slate-100 hover:border-slate-400 bg-white text-base sm:text-lg px-4 sm:px-8 py-3 sm:py-4 rounded-2xl transition-all duration-300 font-medium"
                 >
                   Cancel
                 </Button>
@@ -371,7 +371,7 @@ export const AddBookRoute = () => {
                   type="submit"
                   variant="default"
                   disabled={saving}
-                  className="flex-1 bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-600 hover:from-blue-700 hover:via-blue-800 hover:to-indigo-700 text-white text-lg px-8 py-4 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/25 font-medium disabled:opacity-80 disabled:cursor-not-allowed"
+                  className="flex-1 bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-600 hover:from-blue-700 hover:via-blue-800 hover:to-indigo-700 text-white text-base sm:text-lg px-4 sm:px-8 py-3 sm:py-4 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/25 font-medium disabled:opacity-80 disabled:cursor-not-allowed"
                 >
                   <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />

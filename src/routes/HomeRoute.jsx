@@ -166,14 +166,14 @@ export const HomeRoute = () => {
         {/* Header Section */}
         <div className="text-center mb-12">
           <div className="relative inline-block">
-            <h1 className="text-5xl font-black mb-4">
+            <h1 className="text-3xl sm:text-5xl font-black mb-4">
               <span className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-600 bg-clip-text text-transparent">
                 Your Reading Library
               </span>
             </h1>
             <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-500 rounded-full"></div>
           </div>
-          <p className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
             Track your reading progress, discover new worlds, and celebrate your literary achievements
           </p>
         </div>
@@ -237,13 +237,13 @@ export const HomeRoute = () => {
         {/* Search and Filter Section */}
         <div className="relative mb-12">
           <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-500 rounded-3xl blur-xl opacity-10"></div>
-          <div className="relative bg-white/90 backdrop-blur-sm rounded-3xl p-8 border border-slate-200/50 shadow-xl">
+          <div className="relative bg-white/90 backdrop-blur-sm rounded-3xl p-6 sm:p-8 border border-slate-200/50 shadow-xl">
             <div className="flex flex-col md:flex-row gap-6 md:items-center">
               <div className="flex-1 relative">
                 <input
                   type="text"
                   placeholder="Search books by title or author..."
-                  className="w-full px-6 py-4 rounded-2xl border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-lg placeholder-slate-500"
+                  className="w-full px-4 py-3 sm:px-6 sm:py-4 rounded-2xl border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-base sm:text-lg placeholder-slate-500"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -264,7 +264,7 @@ export const HomeRoute = () => {
               <div className="flex gap-4">
                 <Button
                   onClick={() => setFilter("all")}
-                  className={`px-8 py-4 rounded-2xl cursor-pointer border transition-all duration-300 font-medium ${
+                  className={`px-4 py-3 sm:px-8 sm:py-4 rounded-2xl cursor-pointer border transition-all duration-300 text-sm sm:text-base font-medium ${
                     filter === "all"
                       ? "bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-600 text-white shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30"
                       : "border-slate-300 text-slate-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:border-blue-300 bg-white"
@@ -275,7 +275,7 @@ export const HomeRoute = () => {
                 </Button>
                 <Button
                   onClick={() => setFilter("read")}
-                  className={`px-8 py-4 rounded-2xl cursor-pointer border transition-all duration-300 font-medium ${
+                  className={`px-4 py-3 sm:px-8 sm:py-4 rounded-2xl cursor-pointer border transition-all duration-300 text-sm sm:text-base font-medium ${
                     filter === "read"
                       ? "bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30"
                       : "border-slate-300 text-slate-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:border-blue-300 bg-white"
@@ -286,7 +286,7 @@ export const HomeRoute = () => {
                 </Button>
                 <Button
                   onClick={() => setFilter("unread")}
-                  className={`px-8 py-4 rounded-2xl cursor-pointer border transition-all duration-300 font-medium ${
+                  className={`px-4 py-3 sm:px-8 sm:py-4 rounded-2xl cursor-pointer border transition-all duration-300 text-sm sm:text-base font-medium ${
                     filter === "unread"
                       ? "bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-700 text-white shadow-lg shadow-indigo-500/25 hover:shadow-xl hover:shadow-indigo-500/30"
                       : "border-slate-300 text-slate-700 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-blue-50 hover:border-indigo-300 bg-white"
@@ -311,7 +311,7 @@ export const HomeRoute = () => {
         {filteredBooks.length === 0 ? (
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-r from-slate-500 to-slate-600 rounded-3xl blur-xl opacity-10"></div>
-            <div className="relative bg-white/90 backdrop-blur-sm rounded-3xl p-16 text-center border border-slate-200/50 shadow-xl">
+            <div className="relative bg-white/90 backdrop-blur-sm rounded-3xl p-10 sm:p-16 text-center border border-slate-200/50 shadow-xl">
               <div className="w-24 h-24 bg-gradient-to-br from-slate-400 to-slate-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
                 <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.29-1.009-5.824-2.562M15 6.343a4 4 0 00-5.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.29-1.009-5.824-2.562" />
