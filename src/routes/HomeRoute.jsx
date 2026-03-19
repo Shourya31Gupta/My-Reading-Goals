@@ -164,7 +164,7 @@ export const HomeRoute = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-8 sm:mb-12">
           <div className="relative inline-block">
             <h1 className="text-3xl sm:text-5xl font-black mb-4">
               <span className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-600 bg-clip-text text-transparent">
@@ -180,18 +180,18 @@ export const HomeRoute = () => {
 
         {/* Statistics Cards */}
         {books.length > 0 && !loading && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 mb-8 sm:mb-12">
             <div className="group relative">
                              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-500 rounded-3xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity duration-300"></div>
-               <div className="relative bg-white/90 backdrop-blur-sm rounded-3xl p-8 border border-slate-200/50 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
-                 <div className="flex items-center gap-6">
-                   <div className="w-16 h-16 bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-500 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/25 animate-pulse-slow">
-                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+               <div className="relative bg-white/90 backdrop-blur-sm rounded-3xl p-6 sm:p-8 border border-slate-200/50 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+                 <div className="flex items-center gap-4 sm:gap-6">
+                   <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-500 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/25 animate-pulse-slow">
+                    <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 5.477 5.754 5 7.5 5s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.523 18.246 19 16.5 19c-1.746 0-3.332-.477-4.5-1.253" />
                     </svg>
                   </div>
                   <div>
-                    <p className="text-4xl font-black text-slate-800">{books.length}</p>
+                    <p className="text-3xl sm:text-4xl font-black text-slate-800">{books.length}</p>
                     <p className="text-slate-600 font-medium">Total Books</p>
                   </div>
                 </div>
@@ -200,15 +200,15 @@ export const HomeRoute = () => {
             
                          <div className="group relative">
                <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-indigo-500 to-blue-600 rounded-3xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity duration-300"></div>
-               <div className="relative bg-white/90 backdrop-blur-sm rounded-3xl p-8 border border-slate-200/50 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
-                 <div className="flex items-center gap-6">
-                   <div className="w-16 h-16 bg-gradient-to-br from-blue-500 via-indigo-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/25">
-                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+               <div className="relative bg-white/90 backdrop-blur-sm rounded-3xl p-6 sm:p-8 border border-slate-200/50 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+                 <div className="flex items-center gap-4 sm:gap-6">
+                   <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-blue-500 via-indigo-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/25">
+                    <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
                   <div>
-                    <p className="text-4xl font-black text-slate-800">{readCount}</p>
+                    <p className="text-3xl sm:text-4xl font-black text-slate-800">{readCount}</p>
                     <p className="text-slate-600 font-medium">Completed</p>
                   </div>
                 </div>
@@ -217,15 +217,15 @@ export const HomeRoute = () => {
             
                          <div className="group relative">
                <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 via-blue-500 to-indigo-600 rounded-3xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity duration-300"></div>
-               <div className="relative bg-white/90 backdrop-blur-sm rounded-3xl p-8 border border-slate-200/50 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
-                 <div className="flex items-center gap-6">
-                   <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 via-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/25">
-                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+               <div className="relative bg-white/90 backdrop-blur-sm rounded-3xl p-6 sm:p-8 border border-slate-200/50 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+                 <div className="flex items-center gap-4 sm:gap-6">
+                   <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-indigo-500 via-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/25">
+                    <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
                   <div>
-                    <p className="text-4xl font-black text-slate-800">{unreadCount}</p>
+                    <p className="text-3xl sm:text-4xl font-black text-slate-800">{unreadCount}</p>
                     <p className="text-slate-600 font-medium">To Read</p>
                   </div>
                 </div>
@@ -235,7 +235,7 @@ export const HomeRoute = () => {
         )}
 
         {/* Search and Filter Section */}
-        <div className="relative mb-12">
+        <div className="relative mb-8 sm:mb-12">
           <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-500 rounded-3xl blur-xl opacity-10"></div>
           <div className="relative bg-white/90 backdrop-blur-sm rounded-3xl p-6 sm:p-8 border border-slate-200/50 shadow-xl">
             <div className="flex flex-col md:flex-row gap-6 md:items-center">
@@ -261,7 +261,7 @@ export const HomeRoute = () => {
                   />
                 </svg>
               </div>
-              <div className="flex gap-4">
+              <div className="flex flex-wrap gap-4">
                 <Button
                   onClick={() => setFilter("all")}
                   className={`px-4 py-3 sm:px-8 sm:py-4 rounded-2xl cursor-pointer border transition-all duration-300 text-sm sm:text-base font-medium ${
