@@ -1,33 +1,134 @@
 import { useEffect, useState } from "react";
 import { BookCard } from "@/components/BookCard";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/lib/authContext";
+import { fetchBooks, updateBook, deleteBook as deleteBookRemote, addBook as addBookRemote } from "@/lib/bookService";
 import { getBooksFromStorage, saveBooksToStorage } from "@/lib/storage";
 
 export const HomeRoute = () => {
   const [books, setBooks] = useState([]);
   const [filter, setFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const { user, loading: authLoading } = useAuth();
 
   useEffect(() => {
-    const storedBooks = getBooksFromStorage();
-    setBooks(storedBooks);
-  }, []);
+    const loadBooks = async () => {
+      setError("");
+      setLoading(true);
+
+      try {
+        if (user) {
+          const remoteBooks = await fetchBooks(user.id);
+
+          const mappedRemote = remoteBooks.map((b) => ({
+            id: b.id,
+            title: b.title,
+            author: b.author,
+            isRead: b.is_read,
+            cover_image: b.cover_image ?? b.coverImage ?? "",
+            coverImage: b.cover_image ?? b.coverImage ?? "",
+          }));
+
+          setBooks(mappedRemote);
+
+          const localBooks = getBooksFromStorage();
+          if (localBooks.length > 0 && remoteBooks.length === 0) {
+            try {
+              const created = await Promise.all(
+                localBooks.map((book) =>
+                  addBookRemote(user.id, {
+                    title: book.title,
+                    author: book.author,
+                    isRead: book.isRead,
+                    coverImage: book.coverImage ?? "",
+                  })
+                )
+              );
+
+              const mappedCreated = created.map((b) => ({
+                id: b.id,
+                title: b.title,
+                author: b.author,
+                isRead: b.is_read,
+                cover_image: b.cover_image ?? b.coverImage ?? "",
+                coverImage: b.cover_image ?? b.coverImage ?? "",
+              }));
+
+              setBooks(mappedCreated);
+              saveBooksToStorage([]);
+            } catch (migrationError) {
+              // eslint-disable-next-line no-console
+              console.warn("Failed to migrate local books:", migrationError);
+            }
+          }
+        } else {
+          const storedBooks = getBooksFromStorage();
+          setBooks(
+            (storedBooks ?? []).map((b) => ({
+              ...b,
+              cover_image: b.cover_image ?? b.coverImage ?? "",
+              coverImage: b.coverImage ?? b.cover_image ?? "",
+            }))
+          );
+        }
+      } catch (err) {
+        setError(err.message ?? "Failed to load books.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (!authLoading) {
+      loadBooks();
+    }
+  }, [user, authLoading]);
 
   const updateStorage = (newBooks) => {
-    saveBooksToStorage(newBooks);
+    if (!user) {
+      saveBooksToStorage(newBooks);
+    }
     setBooks(newBooks);
   };
 
-  const toggleReadStatus = (id) => {
-    const updatedBooks = books.map((book) =>
-      book.id === id ? { ...book, isRead: !book.isRead } : book
-    );
-    updateStorage(updatedBooks);
+  const toggleReadStatus = async (id) => {
+    const target = books.find((book) => book.id === id);
+    if (!target) return;
+
+    const nextIsRead = !target.isRead;
+
+    if (user) {
+      try {
+        await updateBook(user.id, id, { isRead: nextIsRead });
+        const updatedBooks = books.map((book) =>
+          book.id === id ? { ...book, isRead: nextIsRead } : book
+        );
+        setBooks(updatedBooks);
+      } catch (err) {
+        setError(err.message ?? "Failed to update book.");
+      }
+    } else {
+      const updatedBooks = books.map((book) =>
+        book.id === id ? { ...book, isRead: nextIsRead } : book
+      );
+      updateStorage(updatedBooks);
+    }
   };
 
-  const handleDelete = (id) => {
-    const updatedBooks = books.filter((book) => book.id !== id);
-    updateStorage(updatedBooks);
+  const handleDelete = async (id) => {
+    if (user) {
+      try {
+        await deleteBookRemote(user.id, id);
+        const updatedBooks = books.filter((book) => book.id !== id);
+        setBooks(updatedBooks);
+      } catch (err) {
+        setError(err.message ?? "Failed to delete book.");
+      }
+    } else {
+      const updatedBooks = books.filter((book) => book.id !== id);
+      updateStorage(updatedBooks);
+    }
   };
 
   const filteredBooks = books.filter((book) => {
@@ -41,7 +142,11 @@ export const HomeRoute = () => {
   });
 
   const getMessage = () => {
-    if (books.length === 0) return "No books added yet.";
+    if (loading) return "Loading your books...";
+
+    if (!user && books.length === 0)
+      return "No books added yet. Log in to sync across devices or start adding as a guest.";
+
     if (books.length > 0 && books.every((book) => book.isRead))
       return "You've read all your books!";
     if (filteredBooks.length === 0) {
@@ -74,7 +179,7 @@ export const HomeRoute = () => {
         </div>
 
         {/* Statistics Cards */}
-        {books.length > 0 && (
+        {books.length > 0 && !loading && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
             <div className="group relative">
                              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-500 rounded-3xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity duration-300"></div>
@@ -194,6 +299,13 @@ export const HomeRoute = () => {
             </div>
           </div>
         </div>
+
+        {/* Error banner */}
+        {error && (
+          <div className="mt-4 mb-6 p-4 bg-gradient-to-r from-red-50 to-red-100 text-red-600 rounded-2xl text-sm border-2 border-red-200">
+            {error}
+          </div>
+        )}
 
         {/* Books Grid */}
         {filteredBooks.length === 0 ? (
