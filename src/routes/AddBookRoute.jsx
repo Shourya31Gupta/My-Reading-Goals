@@ -25,9 +25,11 @@ export const AddBookRoute = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [autocompleteMessage, setAutocompleteMessage] = useState(""); // e.g. "No books found"
   const [isFetching, setIsFetching] = useState(false);
+  const [cooldown, setCooldown] = useState(false);
   const blurTimeoutRef = useRef(null);
   const cacheRef = useRef({});
   const isFetchingRef = useRef(false);
+  const cooldownTimerRef = useRef(null);
 
   // Author input state
   const [author, setAuthor] = useState("");
@@ -79,6 +81,7 @@ export const AddBookRoute = () => {
 
   const fetchBooks = useCallback(async (search) => {
     if (!search || search.length < 3) return;
+    if (cooldown) return;
 
     if (cacheRef.current[search]) {
       const cached = cacheRef.current[search];
@@ -101,9 +104,12 @@ export const AddBookRoute = () => {
       if (res.status === 429) {
         // eslint-disable-next-line no-console
         console.warn("Too many requests");
+        setAutocompleteMessage("Too many requests. Please wait 10 seconds...");
         setSuggestions([]);
-        setAutocompleteMessage("Too many requests, please wait...");
         setShowDropdown(true);
+        setCooldown(true);
+        if (cooldownTimerRef.current) clearTimeout(cooldownTimerRef.current);
+        cooldownTimerRef.current = setTimeout(() => setCooldown(false), 10000);
         return;
       }
 
@@ -141,19 +147,26 @@ export const AddBookRoute = () => {
       // eslint-disable-next-line no-console
       console.error(err);
       setSuggestions([]);
-      setAutocompleteMessage("Could not load book suggestions");
+      setAutocompleteMessage("Error fetching books");
       setShowDropdown(true);
     } finally {
       isFetchingRef.current = false;
       setIsFetching(false);
     }
-  }, []);
+  }, [cooldown]);
 
   // Fetch only when debounced query changes.
   useEffect(() => {
     if (!debouncedQuery || debouncedQuery.length < 3) return;
+    if (cooldown) return;
     fetchBooks(debouncedQuery);
-  }, [debouncedQuery, fetchBooks]);
+  }, [debouncedQuery, cooldown, fetchBooks]);
+
+  useEffect(() => {
+    return () => {
+      if (cooldownTimerRef.current) clearTimeout(cooldownTimerRef.current);
+    };
+  }, []);
 
   const handleSelectSuggestion = (book) => {
     if (blurTimeoutRef.current) clearTimeout(blurTimeoutRef.current);
