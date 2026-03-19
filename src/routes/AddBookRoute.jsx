@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,14 +20,14 @@ export const AddBookRoute = () => {
 
   // Title autocomplete state
   const [query, setQuery] = useState(""); // Book Title input value
+  const [debouncedQuery, setDebouncedQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]); // API results (mapped)
   const [showDropdown, setShowDropdown] = useState(false);
   const [autocompleteMessage, setAutocompleteMessage] = useState(""); // e.g. "No books found"
+  const [isFetching, setIsFetching] = useState(false);
   const blurTimeoutRef = useRef(null);
-  const debounceTimerRef = useRef(null);
   const cacheRef = useRef({});
-  const lastRequestedQueryRef = useRef("");
-  const rateLimitedUntilRef = useRef(0);
+  const isFetchingRef = useRef(false);
 
   // Author input state
   const [author, setAuthor] = useState("");
@@ -46,128 +46,114 @@ export const AddBookRoute = () => {
     }
   }, [authLoading, user, navigate]);
 
-  // Debounced Google Books suggestions fetch
+  // Immediate UI behavior for short/empty input.
   useEffect(() => {
     const trimmed = query.trim();
 
-    // Empty input => hide dropdown
     if (!trimmed) {
       setSuggestions([]);
       setShowDropdown(false);
       setAutocompleteMessage("");
       setCoverImage("");
+      setDebouncedQuery("");
       return;
     }
 
-    // Avoid calling API for very short inputs.
     if (trimmed.length < 3) {
       setSuggestions([]);
       setAutocompleteMessage("Type at least 3 characters");
       setShowDropdown(false);
+      setDebouncedQuery("");
       return;
     }
+  }, [query]);
 
-    // Serve cached suggestions immediately when possible.
-    if (cacheRef.current[trimmed]) {
-      const cached = cacheRef.current[trimmed];
+  // Debounce query -> debouncedQuery
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedQuery(query.trim());
+    }, 500);
+
+    return () => clearTimeout(handler);
+  }, [query]);
+
+  const fetchBooks = useCallback(async (search) => {
+    if (!search || search.length < 3) return;
+
+    if (cacheRef.current[search]) {
+      const cached = cacheRef.current[search];
       setSuggestions(cached);
       setAutocompleteMessage(cached.length === 0 ? "No books found" : "");
       setShowDropdown(true);
       return;
     }
 
-    let isActive = true;
-    const controller = new AbortController();
+    if (isFetchingRef.current) return;
 
-    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    isFetchingRef.current = true;
+    setIsFetching(true);
+    try {
+      const q = encodeURIComponent(search);
+      const url = `https://www.googleapis.com/books/v1/volumes?q=${q}&maxResults=5`;
+      setAutocompleteMessage("");
 
-    debounceTimerRef.current = setTimeout(async () => {
-      // If we are temporarily rate-limited, avoid sending requests.
-      if (Date.now() < rateLimitedUntilRef.current) {
+      const res = await fetch(url);
+      if (res.status === 429) {
+        // eslint-disable-next-line no-console
+        console.warn("Too many requests");
         setSuggestions([]);
         setAutocompleteMessage("Too many requests, please wait...");
         setShowDropdown(true);
         return;
       }
 
-      // Prevent duplicate network calls for same unchanged query.
-      if (lastRequestedQueryRef.current === trimmed) {
-        return;
+      if (!res.ok) {
+        throw new Error(`Google Books API error (${res.status})`);
       }
 
-      lastRequestedQueryRef.current = trimmed;
-      const q = encodeURIComponent(trimmed);
-      const url = `https://www.googleapis.com/books/v1/volumes?q=${q}&maxResults=5`;
+      const json = await res.json();
+      const items = Array.isArray(json.items) ? json.items : [];
 
-      try {
-        setAutocompleteMessage("");
+      const mapped = items
+        .map((item) => {
+          const volumeInfo = item?.volumeInfo ?? {};
+          const title = volumeInfo?.title ?? "";
+          const authors = Array.isArray(volumeInfo?.authors)
+            ? volumeInfo.authors
+            : [];
+          const thumbnail = volumeInfo?.imageLinks?.thumbnail ?? "";
 
-        const res = await fetch(url, { signal: controller.signal });
-        if (!res.ok) {
-          if (res.status === 429) {
-            const rateLimitError = new Error("Google Books API error (429)");
-            rateLimitError.status = 429;
-            throw rateLimitError;
-          }
-          throw new Error(`Google Books API error (${res.status})`);
-        }
+          return {
+            id: item?.id ?? title,
+            title,
+            author: authors[0] ?? "Unknown author",
+            coverImage: normalizeCoverUrl(thumbnail),
+            volumeInfo,
+          };
+        })
+        .filter((x) => x.title);
 
-        const json = await res.json();
-        const items = Array.isArray(json.items) ? json.items : [];
+      cacheRef.current[search] = mapped;
+      setSuggestions(mapped);
+      setAutocompleteMessage(mapped.length === 0 ? "No books found" : "");
+      setShowDropdown(true);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error(err);
+      setSuggestions([]);
+      setAutocompleteMessage("Could not load book suggestions");
+      setShowDropdown(true);
+    } finally {
+      isFetchingRef.current = false;
+      setIsFetching(false);
+    }
+  }, []);
 
-        const mapped = items.map((item) => {
-            const volumeInfo = item?.volumeInfo ?? {};
-            const title = volumeInfo?.title ?? "";
-            const authors = Array.isArray(volumeInfo?.authors)
-              ? volumeInfo.authors
-              : [];
-            const thumbnail = volumeInfo?.imageLinks?.thumbnail ?? "";
-
-            return {
-              id: item?.id ?? title,
-              title,
-              author: authors[0] ?? "Unknown author",
-              coverImage: normalizeCoverUrl(thumbnail),
-              volumeInfo,
-            };
-          }).filter((x) => x.title);
-
-        if (!isActive) return;
-        cacheRef.current[trimmed] = mapped;
-        setSuggestions(mapped);
-
-        if (mapped.length === 0) {
-          setAutocompleteMessage("No books found");
-        } else {
-          setAutocompleteMessage("");
-        }
-
-        setShowDropdown(true);
-      } catch (err) {
-        if (!isActive) return;
-        if (err?.name === "AbortError") return;
-        // Fail gracefully: keep the dropdown but show a message.
-        // (Also hides suggestions to avoid confusing stale results.)
-        // eslint-disable-next-line no-console
-        console.warn("Autocomplete fetch failed:", err);
-        setSuggestions([]);
-        if (err?.status === 429 || err?.message?.includes("(429)")) {
-          // Pause requests briefly after a 429 to reduce repeated failures.
-          rateLimitedUntilRef.current = Date.now() + 15000;
-          setAutocompleteMessage("Too many requests, please wait...");
-        } else {
-          setAutocompleteMessage("Could not load book suggestions");
-        }
-        setShowDropdown(true);
-      }
-    }, 500);
-
-    return () => {
-      isActive = false;
-      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
-      controller.abort();
-    };
-  }, [query]);
+  // Fetch only when debounced query changes.
+  useEffect(() => {
+    if (!debouncedQuery || debouncedQuery.length < 3) return;
+    fetchBooks(debouncedQuery);
+  }, [debouncedQuery, fetchBooks]);
 
   const handleSelectSuggestion = (book) => {
     if (blurTimeoutRef.current) clearTimeout(blurTimeoutRef.current);
