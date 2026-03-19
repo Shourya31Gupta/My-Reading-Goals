@@ -25,6 +25,9 @@ export const AddBookRoute = () => {
   const [autocompleteMessage, setAutocompleteMessage] = useState(""); // e.g. "No books found"
   const blurTimeoutRef = useRef(null);
   const debounceTimerRef = useRef(null);
+  const cacheRef = useRef({});
+  const lastRequestedQueryRef = useRef("");
+  const rateLimitedUntilRef = useRef(0);
 
   // Author input state
   const [author, setAuthor] = useState("");
@@ -64,12 +67,35 @@ export const AddBookRoute = () => {
       return;
     }
 
+    // Serve cached suggestions immediately when possible.
+    if (cacheRef.current[trimmed]) {
+      const cached = cacheRef.current[trimmed];
+      setSuggestions(cached);
+      setAutocompleteMessage(cached.length === 0 ? "No books found" : "");
+      setShowDropdown(true);
+      return;
+    }
+
     let isActive = true;
     const controller = new AbortController();
 
     if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
 
     debounceTimerRef.current = setTimeout(async () => {
+      // If we are temporarily rate-limited, avoid sending requests.
+      if (Date.now() < rateLimitedUntilRef.current) {
+        setSuggestions([]);
+        setAutocompleteMessage("Too many requests, please wait...");
+        setShowDropdown(true);
+        return;
+      }
+
+      // Prevent duplicate network calls for same unchanged query.
+      if (lastRequestedQueryRef.current === trimmed) {
+        return;
+      }
+
+      lastRequestedQueryRef.current = trimmed;
       const q = encodeURIComponent(trimmed);
       const url = `https://www.googleapis.com/books/v1/volumes?q=${q}&maxResults=5`;
 
@@ -78,6 +104,11 @@ export const AddBookRoute = () => {
 
         const res = await fetch(url, { signal: controller.signal });
         if (!res.ok) {
+          if (res.status === 429) {
+            const rateLimitError = new Error("Google Books API error (429)");
+            rateLimitError.status = 429;
+            throw rateLimitError;
+          }
           throw new Error(`Google Books API error (${res.status})`);
         }
 
@@ -102,6 +133,7 @@ export const AddBookRoute = () => {
           }).filter((x) => x.title);
 
         if (!isActive) return;
+        cacheRef.current[trimmed] = mapped;
         setSuggestions(mapped);
 
         if (mapped.length === 0) {
@@ -119,7 +151,9 @@ export const AddBookRoute = () => {
         // eslint-disable-next-line no-console
         console.warn("Autocomplete fetch failed:", err);
         setSuggestions([]);
-        if (err?.message?.includes("(429)")) {
+        if (err?.status === 429 || err?.message?.includes("(429)")) {
+          // Pause requests briefly after a 429 to reduce repeated failures.
+          rateLimitedUntilRef.current = Date.now() + 15000;
           setAutocompleteMessage("Too many requests, please wait...");
         } else {
           setAutocompleteMessage("Could not load book suggestions");
