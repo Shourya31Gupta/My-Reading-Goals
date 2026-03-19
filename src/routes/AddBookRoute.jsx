@@ -10,6 +10,7 @@ import { addBook as addBookRemote } from "@/lib/bookService";
 export const AddBookRoute = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
+  const API_KEY = import.meta.env.VITE_GOOGLE_BOOKS_API_KEY;
 
   const normalizeCoverUrl = (url) => {
     if (!url) return "";
@@ -47,6 +48,13 @@ export const AddBookRoute = () => {
       // navigate("/login");
     }
   }, [authLoading, user, navigate]);
+
+  useEffect(() => {
+    if (!API_KEY) {
+      // eslint-disable-next-line no-console
+      console.warn("Google Books API key is missing");
+    }
+  }, [API_KEY]);
 
   // Immediate UI behavior for short/empty input.
   useEffect(() => {
@@ -97,7 +105,8 @@ export const AddBookRoute = () => {
     setIsFetching(true);
     try {
       const q = encodeURIComponent(search);
-      const url = `https://www.googleapis.com/books/v1/volumes?q=${q}&maxResults=5`;
+      const keyParam = API_KEY ? `&key=${encodeURIComponent(API_KEY)}` : "";
+      const url = `https://www.googleapis.com/books/v1/volumes?q=${q}&maxResults=5${keyParam}`;
       setAutocompleteMessage("");
 
       const res = await fetch(url);
@@ -110,6 +119,12 @@ export const AddBookRoute = () => {
         setCooldown(true);
         if (cooldownTimerRef.current) clearTimeout(cooldownTimerRef.current);
         cooldownTimerRef.current = setTimeout(() => setCooldown(false), 10000);
+        return;
+      }
+      if (res.status === 403) {
+        setSuggestions([]);
+        setAutocompleteMessage("API key error. Check configuration.");
+        setShowDropdown(true);
         return;
       }
 
@@ -153,7 +168,7 @@ export const AddBookRoute = () => {
       isFetchingRef.current = false;
       setIsFetching(false);
     }
-  }, [cooldown]);
+  }, [cooldown, API_KEY]);
 
   // Fetch only when debounced query changes.
   useEffect(() => {
