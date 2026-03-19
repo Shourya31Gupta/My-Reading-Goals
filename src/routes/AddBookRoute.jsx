@@ -45,12 +45,22 @@ export const AddBookRoute = () => {
 
   // Debounced Google Books suggestions fetch
   useEffect(() => {
+    const trimmed = query.trim();
+
     // Empty input => hide dropdown
-    if (!query.trim()) {
+    if (!trimmed) {
       setSuggestions([]);
       setShowDropdown(false);
       setAutocompleteMessage("");
       setCoverImage("");
+      return;
+    }
+
+    // Avoid calling API for very short inputs.
+    if (trimmed.length < 3) {
+      setSuggestions([]);
+      setAutocompleteMessage("Type at least 3 characters");
+      setShowDropdown(false);
       return;
     }
 
@@ -60,8 +70,8 @@ export const AddBookRoute = () => {
     if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
 
     debounceTimerRef.current = setTimeout(async () => {
-      const q = encodeURIComponent(query.trim());
-      const url = `https://www.googleapis.com/books/v1/volumes?q=${q}`;
+      const q = encodeURIComponent(trimmed);
+      const url = `https://www.googleapis.com/books/v1/volumes?q=${q}&maxResults=5`;
 
       try {
         setAutocompleteMessage("");
@@ -74,9 +84,7 @@ export const AddBookRoute = () => {
         const json = await res.json();
         const items = Array.isArray(json.items) ? json.items : [];
 
-        const mapped = items
-          .slice(0, 5)
-          .map((item) => {
+        const mapped = items.map((item) => {
             const volumeInfo = item?.volumeInfo ?? {};
             const title = volumeInfo?.title ?? "";
             const authors = Array.isArray(volumeInfo?.authors)
@@ -91,8 +99,7 @@ export const AddBookRoute = () => {
               coverImage: normalizeCoverUrl(thumbnail),
               volumeInfo,
             };
-          })
-          .filter((x) => x.title);
+          }).filter((x) => x.title);
 
         if (!isActive) return;
         setSuggestions(mapped);
@@ -106,15 +113,20 @@ export const AddBookRoute = () => {
         setShowDropdown(true);
       } catch (err) {
         if (!isActive) return;
+        if (err?.name === "AbortError") return;
         // Fail gracefully: keep the dropdown but show a message.
         // (Also hides suggestions to avoid confusing stale results.)
         // eslint-disable-next-line no-console
         console.warn("Autocomplete fetch failed:", err);
         setSuggestions([]);
-        setAutocompleteMessage("Could not load book suggestions");
+        if (err?.message?.includes("(429)")) {
+          setAutocompleteMessage("Too many requests, please wait...");
+        } else {
+          setAutocompleteMessage("Could not load book suggestions");
+        }
         setShowDropdown(true);
       }
-    }, 300);
+    }, 500);
 
     return () => {
       isActive = false;
