@@ -61,10 +61,10 @@ export const BookCard = ({ book, onToggleRead, onDelete }) => {
         } group-hover:opacity-30`}
       />
 
-      <Card className="w-full relative bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-200 border border-slate-200/50 hover:border-slate-300/50 group-hover:shadow-blue-500/10 group-hover:-translate-y-1 group-hover:scale-[1.01] h-64 sm:h-72 overflow-hidden">
+      <Card className="w-full relative bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-200 border border-slate-200/50 hover:border-slate-300/50 group-hover:shadow-blue-500/10 group-hover:-translate-y-1 group-hover:scale-[1.01] h-60 sm:h-72 overflow-hidden">
         <div className="h-full w-full flex flex-col">
           {/* 1) Top → Title + Author */}
-          <div className="p-4 sm:p-5 flex-none">
+          <div className="p-3.5 sm:p-5 flex-none">
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-start gap-3 min-w-0 flex-1">
                 <div className="w-10 h-14 sm:w-12 sm:h-16 rounded-xl overflow-hidden border border-slate-200/70 bg-gradient-to-br from-blue-50 to-indigo-50 shadow-sm flex-shrink-0">
@@ -102,7 +102,7 @@ export const BookCard = ({ book, onToggleRead, onDelete }) => {
           </div>
 
           {/* 2) Middle → Status badge (fixed positioning) */}
-          <div className="flex-1 flex items-center justify-center px-4 sm:px-5">
+          <div className="flex-1 flex items-center justify-center px-3.5 sm:px-5">
             <div
               className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 border-2 ${
                 isRead
@@ -129,28 +129,28 @@ export const BookCard = ({ book, onToggleRead, onDelete }) => {
           </div>
 
           {/* 3) Bottom → Buttons (pinned to bottom) */}
-          <div className="p-4 sm:p-5 flex-none mt-auto">
-            <div className="flex gap-3">
+          <div className="p-3.5 sm:p-5 flex-none mt-auto">
+            <div className="flex gap-2 mt-3 w-full min-w-0">
               <Button
                 onClick={(e) => {
                   e.stopPropagation();
                   onToggleRead(book.id);
                 }}
-                className="flex-1 h-9 sm:h-10 px-4 text-xs sm:text-sm rounded-2xl font-medium transition-all duration-200 transform bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-600 text-white shadow-md shadow-blue-500/25 hover:shadow-lg hover:shadow-blue-500/30 hover:from-blue-700 hover:via-blue-800 hover:to-indigo-700 hover:scale-[1.02]"
+                className="w-full flex-1 min-w-0 py-2 px-2.5 sm:px-4 text-[11px] sm:text-sm rounded-lg font-medium transition-all duration-200 transform bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-600 text-white shadow-md shadow-blue-500/25 hover:shadow-lg hover:shadow-blue-500/30 hover:from-blue-700 hover:via-blue-800 hover:to-indigo-700 hover:scale-[1.02]"
               >
                 {isRead ? (
                   <>
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    Mark Unread
+                    <span className="truncate">Mark Unread</span>
                   </>
                 ) : (
                   <>
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    Mark Read
+                    <span className="truncate">Mark Read</span>
                   </>
                 )}
               </Button>
@@ -160,12 +160,12 @@ export const BookCard = ({ book, onToggleRead, onDelete }) => {
                   e.stopPropagation();
                   onDelete(book.id);
                 }}
-                className="flex-1 h-9 sm:h-10 px-4 text-xs sm:text-sm rounded-2xl font-medium transition-all duration-200 transform bg-gradient-to-r from-red-500 via-rose-600 to-pink-600 text-white shadow-md shadow-red-500/25 hover:shadow-lg hover:shadow-red-500/30 hover:from-red-600 hover:via-rose-700 hover:to-pink-700 hover:scale-[1.02]"
+                className="w-full flex-1 min-w-0 py-2 px-2.5 sm:px-4 text-[11px] sm:text-sm rounded-lg font-medium transition-all duration-200 transform bg-gradient-to-r from-red-500 via-rose-600 to-pink-600 text-white shadow-md shadow-red-500/25 hover:shadow-lg hover:shadow-red-500/30 hover:from-red-600 hover:via-rose-700 hover:to-pink-700 hover:scale-[1.02]"
               >
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                 </svg>
-                Delete
+                <span className="truncate">Delete</span>
               </Button>
             </div>
           </div>

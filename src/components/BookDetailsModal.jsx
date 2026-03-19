@@ -62,7 +62,7 @@ export const BookDetailsModal = ({ open, book, onClose }) => {
       }}
     >
       <div
-        className={`relative w-[min(760px,96vw)] rounded-3xl bg-white/95 backdrop-blur-sm border border-slate-200/50 shadow-2xl p-4 sm:p-8 transform transition-all duration-200 ${
+        className={`relative w-[90%] sm:w-[min(760px,96vw)] rounded-3xl bg-white/95 backdrop-blur-sm border border-slate-200/50 shadow-2xl p-4 sm:p-8 transform transition-all duration-200 ${
           visible ? "scale-100 opacity-100" : "scale-95 opacity-0"
         }`}
         onClick={(e) => e.stopPropagation()}
